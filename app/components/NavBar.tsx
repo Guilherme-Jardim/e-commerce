@@ -1,4 +1,5 @@
 import Link from "next/link";
+import MenuAvatar from "./MenuAvatar";
 
 export default function NavBar() {
   return (
@@ -6,6 +7,11 @@ export default function NavBar() {
       <Link href='/' className="uppercase font-bold text-md h-12 flex items-center">
         Next Store
       </Link>
+      <div className="relative">
+        <div className="">
+          <MenuAvatar />
+        </div>
+      </div>
     </nav>
   );
 }
