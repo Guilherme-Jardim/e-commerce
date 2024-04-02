@@ -1,3 +1,6 @@
+"use client"
+import { signIn } from "next-auth/react";
+
 export default function MenuSigInUp() {
   return (
     <div className="p-4 bg-slate-900">
@@ -16,7 +19,8 @@ export default function MenuSigInUp() {
         <button
           type="submit"
           className="bg-slate-500 text-white w-full p-2 rounded-md"
-        >Entrar</button>
+        >Entrar
+        </button>
       </form>
       <p
         className="mt-2 text-sm text-white"
@@ -29,6 +33,20 @@ export default function MenuSigInUp() {
         href="/register"
         className="text-white underline"
       >Registre-se</a>
+      <div>
+        <button
+          type="submit"
+          className="bg-slate-500 text-white w-full p-2 rounded-md"
+          onClick={() => signIn("github", { callbackUrl: "/perfil" })}
+        >Login com GitHub
+        </button>
+        <button
+          type="submit"
+          className="bg-slate-500 text-white w-full p-2 rounded-md"
+          onClick={() => signIn("google", { callbackUrl: "/perfil" })}
+        >Login com Google
+        </button>
+      </div>
     </div>
   );
 }
