@@ -1,9 +1,9 @@
 'use client'
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import MenuSigInUp from "./MenuSigInUp";
+import MenuLogOut from "./MenuLogOut";
 
-export default function MenuAvatar() {
+export default function MenuAvatarLogOut() {
 
   const [showMenu, setShowMenu] = useState(false);
 
@@ -37,11 +37,11 @@ export default function MenuAvatar() {
         onClick={() => handleToggleMenu()}
       >
         <Image width={100} height={150} src="/avatar.svg" alt="Avatar" className="w-8 h-8 rounded-full" />
-        <span className="ml-2 text-sm font-medium">Login</span>
+        <span className="ml-2 text-sm font-medium">LogOut</span>
       </button>
       {showMenu && (
         <div ref={menuRef} className="absolute z-10 bg-white rounded-md shadow-lg flex flex-col items-start w-80 mt-2 right-0">
-          <MenuSigInUp />
+          <MenuLogOut />
         </div>
       )}
     </div>

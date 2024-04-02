@@ -1,4 +1,4 @@
-import Product from "../components/Product";
+import Product from "../components/products/Product";
 import { ProductType } from "../types/ProductType";
 async function getProducts() {
   try {

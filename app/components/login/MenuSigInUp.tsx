@@ -2,16 +2,31 @@
 import { signIn } from "next-auth/react";
 
 export default function MenuSigInUp() {
+  async function login(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+
+    const data = {
+      email: formData.get("email"),
+      password: formData.get("password"),
+    };
+    signIn("credentials", {
+      ...data,
+      callbackUrl: "/perfil",
+    });
+  }
   return (
     <div className="p-4 bg-slate-900">
       <h2 className="text-lg font-medium text-white">Login</h2>
-      <form>
+      <form onSubmit={login}>
         <input
+          name="email"
           type="email"
           placeholder="Email"
           className="w-full border-b text-slate-950 border-gray-200 mb-4 p-2"
         />
         <input
+          name="password"
           type="password"
           placeholder="Senha"
           className="w-full border-b text-slate-950 border-gray-200 mb-4 p-2"

@@ -1,8 +1,10 @@
 import { getServerSession } from "next-auth";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 
 export default async function Perfil() {
   const session = await getServerSession();
+  const imageUrl = session?.user?.image;
   if (!session) {
     return redirect('/');
   }
@@ -10,7 +12,14 @@ export default async function Perfil() {
     <div>
       <p>Olá, {session?.user?.name}</p>
       <p>Email: {session?.user?.email}</p>
-      <p>Image url: {session?.user?.image}</p>
+      {typeof imageUrl === 'string' && (
+        <Image
+          alt="Imagem Perfil"
+          src={imageUrl}
+          width={50}
+          height={50}
+        />
+      )}
     </div>
   );
 }
