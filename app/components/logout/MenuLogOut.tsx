@@ -4,7 +4,7 @@ import { signOut } from "next-auth/react";
 export default function MenuLogOut() {
 
   return (
-    <div className="p-4 bg-slate-900">
+    <div className="p-4 bg-slate-900 w-full">
       <h2 className="text-lg font-medium text-white">LogOut</h2>
       <button
         type="submit"

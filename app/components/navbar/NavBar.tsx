@@ -5,7 +5,11 @@ import MenuAvatarLogOut from "../logout/MenuAvatarLogOut";
 import MenuAvatarSigIn from "../login/MenuAvatarSigIn";
 
 export default function NavBar() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+
+  if (status === "loading") {
+    return null;
+  }
 
   return (
     <nav className="fixed top-0 w-full flex items-center py-2 px-8 justify-between z-50 bg-slate-800 text-gray-300">

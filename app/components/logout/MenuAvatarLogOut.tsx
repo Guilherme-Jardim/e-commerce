@@ -1,9 +1,12 @@
 'use client'
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import MenuLogOut from "./MenuLogOut";
+import ImagePerfil from "../perfil/ImagePerfil";
+import { useSession } from "next-auth/react";
 
 export default function MenuAvatarLogOut() {
+
+  const { data: session } = useSession();
 
   const [showMenu, setShowMenu] = useState(false);
 
@@ -29,6 +32,8 @@ export default function MenuAvatarLogOut() {
     setShowMenu(!showMenu);
   };
 
+  const imageUrl = session?.user?.image;
+
   return (
     <div className="inline-block">
       <button
@@ -36,8 +41,9 @@ export default function MenuAvatarLogOut() {
         className="flex items-center border border-gray-200 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
         onClick={() => handleToggleMenu()}
       >
-        <Image width={100} height={150} src="/avatar.svg" alt="Avatar" className="w-8 h-8 rounded-full" />
-        <span className="ml-2 text-sm font-medium">LogOut</span>
+        {session && typeof imageUrl === 'string' && (
+          <ImagePerfil imageUrl={imageUrl} />
+        )}
       </button>
       {showMenu && (
         <div ref={menuRef} className="absolute z-10 bg-white rounded-md shadow-lg flex flex-col items-start w-80 mt-2 right-0">
