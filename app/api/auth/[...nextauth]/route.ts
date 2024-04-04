@@ -1,160 +1,100 @@
-import NextAuth from "next-auth"
+import { AuthOptions } from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import prisma from "../../../lib/prisma";
 
-const handler = NextAuth({
+let userAccount;
+
+const authOptions: AuthOptions = {
   providers: [
     GitHubProvider({
-      clientId: process.env.GITHUB_ID !,
-      clientSecret: process.env.GITHUB_SECRET !
+      clientId: process.env.GITHUB_ID!,
+      clientSecret: process.env.GITHUB_SECRET!,
     }),
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID !,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET !
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
     CredentialsProvider({
-      name: "Credentials",
       credentials: {
-        username: { label: "Username", type: "text", placeholder: "jsmith" },
-        password: { label: "Password", type: "password" }
+        email: { label: "Email", type: "text", placeholder: "Email" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
-        const user = { id: "1", name: "J Smith", email: "jsmith@example.com" }
-  
-        if (user) {        
-          return user
-        } else {
-          return null
+        const email = credentials?.email;
+        const password = credentials?.password;
+
+        if (!email || !password) {
+          return null;
         }
-      }
+
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/user/login`,
+          {
+            method: "POST",
+            body: JSON.stringify({ email, password }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const user = await res.json();
+
+        if (res.ok && user) {
+          userAccount = user;
+          console.log(userAccount);
+          return user;
+        } else {
+          return null;
+        }
+      },
     }),
   ],
+
+  adapter: PrismaAdapter(prisma),
+  secret: process.env.NEXTAUTH_SECRET,
+  session: { strategy: "jwt", maxAge: 24 * 60 * 60 },
+
+  jwt: {
+    secret: process.env.NEXTAUTH_SECRET,
+    maxAge: 60 * 60 * 24 * 30,
+  },
+
+  pages: {
+    signIn: "/perfil",
+    signOut: "/",
+    error: "/auth/error",
+  },
+
   callbacks: {
-    session({ session, token, user }) {
-      return session // The return type will match the one returned in `useSession()`
+    async session(params: {
+      session: any; // Ou ajuste para o tipo correto se possível
+      token: any; // Ou ajuste para o tipo correto se possível
+      user: any; // Ou ajuste para o tipo correto se possível
+      newSession: any; // Ou ajuste para o tipo correto se possível
+      trigger: "update";
+    }): Promise<any> {
+      const { session, user, token, newSession, trigger } = params;
+    
+      // Sua lógica de sessão aqui
+    
+      return session;
+    },
+    
+
+    async jwt({ token, user }) {
+      const isSignedIn = user ? true : false;
+
+      if (isSignedIn) {
+        token.accessToken =
+          user.id.toString() + "-" + user.email + "-" + user.name;
+      }
+
+      return await token;
     },
   },
-  pages: {
-    signIn: '/',
-    signOut: '/perfil',
-    error: '/auth/error', // Error code passed in query string as ?error=
-    verifyRequest: '/auth/verify-request', // (used for check email message)
-    newUser: '/auth/new-user' // New users will be directed here on first sign in (leave the property out if not of interest)
-  }
-})
+};
 
-export { handler as GET, handler as POST }
-
-
-
-
-
-
-
-
-// import NextAuth, { NextAuthOptions } from 'next-auth'
-// import GitHubProvider, { GithubProfile } from "next-auth/providers/github";
-// import GoogleProvider, { GoogleProfile } from "next-auth/providers/google";
-// import CredentialsProvider, { CredentialsProfile } from "next-auth/providers/credentials";
-// import { PrismaAdapter } from '../../../lib/auth/prisma-adapter'
-// import { NextApiRequest, NextApiResponse } from 'next'
-
-// export function buildNextAuthOptions(
-//   req: NextApiRequest,
-//   res: NextApiResponse,
-// ): NextAuthOptions {
-//   return {
-//     providers: [
-//       GitHubProvider({
-//         clientId: process.env.GITHUB_ID!,
-//         clientSecret: process.env.GITHUB_SECRET!,
-//         authorization: {
-//           params: {
-//             scope:
-//               'read:user user:email',
-//           },
-//         },
-//         profile(profile: GithubProfile) {
-//           return {
-//             id: profile.id.toString(),
-//             name: profile.name ?? '',
-//             username: profile.login ?? '',
-//             email: profile.email ?? '',
-//             avatar_url: profile.avatar_url ?? '',
-//           }
-//         },
-//       }),
-//       GoogleProvider({
-//         clientId: process.env.GOOGLE_CLIENT_ID!,
-//         clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-//         authorization: {
-//           params: {
-//             scope:
-//               'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
-//           },
-//         },
-//         profile(profile: GoogleProfile) {
-//           return {
-//             id: profile.sub,
-//             name: profile.name ?? '',
-//             username: '',
-//             email: profile.email ?? '',
-//             avatar_url: profile.picture ?? '',
-//           }
-//         },
-//       }),
-//       CredentialsProvider({
-//         name: "Credentials",
-//         credentials: {
-//           username: { label: "Username", type: "text", placeholder: "jsmith" },
-//           password: { label: "Password", type: "password" }
-//         },
-//         async authorize(credentials, req) {
-//           const user = { id: "1", name: "J Smith", email: "jsmith@example.com" }
-    
-//           if (user) {        
-//             return user
-//           } else {
-//             return null
-//           }
-//         },
-//         authorization: {
-//           params: {            
-//           },
-//         },
-//         profile(profile: CredentialsProfile) {
-//           return {
-//             id: profile.sub,
-//             name: profile.name ?? '',
-//             username: '',
-//             email: profile.email ?? '',
-//             avatar_url: profile.picture ?? '',
-//           }
-//         },
-//       }),
-//     ],
-//     callbacks: {
-//       async signIn({ account }) {
-//         if (
-//           !account?.scope?.includes('https://www.googleapis.com/auth/userinfo.profile')
-//         ) {
-//           return '/register/connect-calendar/?error=permissions'
-//         }
-//         return true
-//       },
-//     },
-//     pages: {
-//       signIn: '/', // Página de login
-//       signOut: '/perfil', // Página de logout
-//       error: '/auth/error', // Página de erro (código de erro passado na string de consulta como ?error=)
-//       verifyRequest: '/auth/verify-request', // Usado para verificar o email
-//       newUser: '/auth/new-user' // Novos usuários serão redirecionados aqui na primeira entrada (deixe a propriedade de fora se não for do interesse)
-//     },
-//     adapter: PrismaAdapter(req, res),
-//   }
-// }
-
-// export default async function auth(req: NextApiRequest, res: NextApiResponse) {
-//   return await NextAuth(req, res, buildNextAuthOptions(req, res))
-// }
+export default authOptions;

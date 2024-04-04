@@ -3,11 +3,48 @@ import { SyntheticEvent, useState } from "react";
 import { Prisma } from "@prisma/client";
 
 export default function Register() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: ""
-  });
+  const [name, setName] = useState();
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
+  const [confirmPassword, setConfirmPassword] = useState();
+  const [passError, setPassError] = useState(false);
+
+  useEffect(() => {
+    validatePassword(password, confirmPassword);
+  }, [password, confirmPassword]);
+
+  function validatePassword(pass, confrimPass) {
+    let isValid = pass === confrimPass;
+    if (!isValid) {
+      setPassError(true);
+    }
+  }
+  async function handleSubmit(e) {
+    e.preventDefault();
+    let userData = {
+      name,
+      email,
+      password,
+    };
+
+    // Make call to backend to create user
+    const res = await fetch("http://localhost:3000/api/user/create", {
+      method: "POST",
+      body: JSON.stringify(userData),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      router.push('/login')
+
+      // registration success
+    } else {
+      //registration faled
+    }
+  }
 
   async function handleSubmit(e: SyntheticEvent) {
     e.preventDefault();
