@@ -18,7 +18,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
           <Link href='/' className="uppercase font-bold text-md h-12 flex items-center">
             Next Store
           </Link>
-          <div className="relative">
+          <div>
             <div className="">
               {session ? (
                 <MenuAvatarLogOut />

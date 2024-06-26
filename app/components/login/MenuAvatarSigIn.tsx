@@ -40,7 +40,7 @@ export default function MenuAvatarSigIn() {
         <span className="ml-2 text-sm font-medium">Login</span>
       </button>
       {showMenu && (
-        <div ref={menuRef} className="absolute z-10 bg-white rounded-md shadow-lg flex flex-col items-start w-80 mt-2 right-0">
+        <div ref={menuRef} className="absolute z-10 w-auto mt-2 right-8">
           <MenuSigInUp />
         </div>
       )}
